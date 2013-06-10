@@ -91,7 +91,7 @@ class Path(nt('Path', ['path'])):
         else:
             raise TypeError(how, 'should be one of', [TMP, COUNTER])
     
-    def rm(self): os.unlink(str(self))
+    def rm(self): shutil.rmtree(str(self))
     def set(self, wth):
         self.make_parents()
         open(str(self), 'w').write(wth)
@@ -105,6 +105,8 @@ class Path(nt('Path', ['path'])):
         open(str(self), 'a').write(wth)
     def open(self):
         return open(str(self), 'r')
+    def read(self):
+        return self.open().read()
     def cp(self, dest):
         dest = p(dest)
         if dest.isdir:
