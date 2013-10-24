@@ -91,7 +91,11 @@ class Path(nt('Path', ['path'])):
         else:
             raise TypeError(how, 'should be one of', [RAND, COUNTER])
     
-    def rm(self): shutil.rmtree(str(self))
+    def rm(self):
+        if self.isdir:
+            shutil.rmtree(str(self))
+        else:
+            os.unlink(str(self))
     def set(self, wth):
         self.make_parents()
         open(str(self), 'w').write(wth)
