@@ -147,3 +147,12 @@ def nstruct(name):
         of = lambda **things: nt(name, things.keys())(**things)
     )
     
+def sink_to_temp(content, key):
+    import tempfile
+    import atexit
+    import hashlib
+    path = p(tempfile.gettempdir()) / hashlib.sha1(key).hexdigest()
+    atexit.register(lambda: os.unlink(str(path)))
+    open(str(path), 'w').write(content)
+    return p(path)
+    
