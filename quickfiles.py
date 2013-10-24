@@ -89,7 +89,7 @@ class Path(nt('Path', ['path'])):
             now = max(numbers) + 1 if len(numbers)>0 else 1
             return self/(how.prefix + str(now))
         else:
-            raise TypeError(how, 'should be one of', [TMP, COUNTER])
+            raise TypeError(how, 'should be one of', [RAND, COUNTER])
     
     def rm(self): shutil.rmtree(str(self))
     def set(self, wth):
