@@ -98,7 +98,8 @@ class Path(nt('Path', ['path'])):
             os.unlink(str(self))
     def set(self, wth):
         self.make_parents()
-        open(str(self), 'w').write(wth)
+        with open(str(self), 'w') as h:
+            h.write(wth)
     def clear(self):
         self.set('')
     def setas(self, wth):
