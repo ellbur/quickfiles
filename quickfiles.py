@@ -128,6 +128,10 @@ class RAND(_RAND):
         return _RAND.__new__(_cls, prefix, suffix)
 
 def p(s):
+    try:
+        isstring = isinstance(s, basestring)
+    except NameError:
+        isstring = isinstance(s, str)
     if isinstance(s, Path): return s
     elif isinstance(s, basestring): return Path(os.path.normpath(os.path.relpath(s)))
     else: raise TypeError
