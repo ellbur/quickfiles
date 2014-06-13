@@ -119,6 +119,9 @@ class Path(nt('Path', ['path'])):
             shutil.copytree(str(self), str(dest))
         else:
             shutil.copy2(str(self), str(dest))
+    def delete_at_exit(self):
+        import atexit
+        atexit.register(lambda: os.unlink(str(self)))
     
 class COUNTER(nt('COUNTER', ['prefix'])): pass
 _RAND = nt('RAND', ['prefix', 'suffix'])
