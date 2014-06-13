@@ -19,15 +19,15 @@ class PTuple(tuple):
             res.extend(func(_))
         return PTuple(res)
     
-class Path(nt('Path', ['path'])):
+class Path(unicode):
     @staticmethod
     def mktemp():
         import tempfile
         _, path = tempfile.mkstemp()
         return p(path)
-    def __repr__(self): return './' + self.path
+    def __repr__(self): return './' + str(self)
     @property
-    def realpath(self): return os.path.realpath(self.path)
+    def realpath(self): return os.path.realpath(str(self))
     def __truediv__(self, next):
         return self.__div__(next)
     def __div__(self, next):
@@ -40,10 +40,10 @@ class Path(nt('Path', ['path'])):
     @property
     def isdir(self): return os.path.isdir(str(self))
     def chext(self, old, new):
-        assert self.path.endswith(old)
-        return p(seld.path[:-len(old)] + new)
+        assert str(self).endswith(old)
+        return p(str(self)[:-len(old)] + new)
     def setext(self, new):
-        prefix = re.sub(r'\.[^\.\/]*$', '', self.path)
+        prefix = re.sub(r'\.[^\.\/]*$', '', str(self))
         return p(prefix + new)
     @property
     def name(self): return os.path.split(os.path.realpath(str(self)))[1]
