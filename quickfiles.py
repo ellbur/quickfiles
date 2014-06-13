@@ -137,6 +137,8 @@ def p(s):
     else: raise TypeError
 _p = p
 
+def dirof(s): return p(s).dir
+
 t = tuple
 def tt(*things): return tuple(things)
 
