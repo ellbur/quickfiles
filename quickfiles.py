@@ -155,4 +155,22 @@ def sink_to_temp(content, key):
     atexit.register(lambda: os.unlink(str(path)))
     open(str(path), 'w').write(content)
     return p(path)
+
+def sink_to_temp_no_delete(content, key):
+    import tempfile
+    import atexit
+    import hashlib
+    path = p(tempfile.gettempdir()) / hashlib.sha1(key).hexdigest()
+    print('Writing ' + str(path))
+    print('setting content to ' + str(len(content)) + ' chars')
+    path.set(content)
+    return path
+    
+def fileof(content):
+    import tempfile
+    import atexit
+    _, path = tempfile.mkstemp()
+    atexit.register(lambda: os.unlink(path))
+    open(path, 'w').write(content)
+    return p(path)
     
