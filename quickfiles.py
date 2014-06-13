@@ -111,6 +111,9 @@ class Path(nt('Path', ['path'])):
         return open(str(self), 'r')
     def read(self):
         return self.open().read()
+    @property
+    def content(self):
+        return self.read()
     def cp(self, dest):
         dest = p(dest)
         if dest.isdir:
