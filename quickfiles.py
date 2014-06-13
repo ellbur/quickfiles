@@ -133,7 +133,7 @@ def p(s):
     except NameError:
         isstring = isinstance(s, str)
     if isinstance(s, Path): return s
-    elif isinstance(s, basestring): return Path(os.path.normpath(os.path.relpath(s)))
+    elif isstring: return Path(os.path.normpath(os.path.relpath(s)))
     else: raise TypeError
 _p = p
 
