@@ -24,8 +24,9 @@ class Path(unicode):
     def mktemp():
         import tempfile
         _, path = tempfile.mkstemp()
-        return p(path)
-    def __repr__(self): return './' + str(self)
+        result = p(path)
+        result.rm()
+        return result
     @property
     def realpath(self): return os.path.realpath(str(self))
     def __truediv__(self, next):
@@ -70,9 +71,10 @@ class Path(unicode):
             def see(_, dir, __):
                 dirs.append(p(dir))
             os.path.walk(str(self), see, None)
-            return PTuple(dirs)
+            return PTuple(sorted(dirs))
         else:
-            return PTuple(p(_) for _ in glob(str(self) + '/' + pat))
+            files = PTuple(p(_) for _ in glob(str(self) + '/' + pat))
+            return PTuple(sorted(files, key=lambda _: _.name))
     def __mod__(self, how):
         if isinstance(how, RAND):
             import tempfile
@@ -140,7 +142,7 @@ def p(s):
     except NameError:
         isstring = isinstance(s, str)
     if isinstance(s, Path): return s
-    elif isstring: return Path(os.path.normpath(os.path.relpath(s)))
+    elif isstring: return Path('./'+os.path.normpath(os.path.relpath(s)))
     else: raise TypeError
 _p = p
 
