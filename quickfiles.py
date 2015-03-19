@@ -75,6 +75,17 @@ class Path(unicode):
                 dirs.append(p(dir))
             os.path.walk(self, see, None)
             return PTuple(sorted(dirs))
+        elif pat == '***':
+            dir_stack = [self]
+            result = [ ]
+            while len(dir_stack) > 0:
+                top = dir_stack[-1]
+                del dir_stack[-1]
+                result.append(top)
+                for next in top//'*':
+                    if next.isdir:
+                        dir_stack.append(next)
+            return PTuple(sorted(result))
         else:
             files = PTuple(p(_) for _ in glob(self + '/' + pat))
             return PTuple(sorted(files, key=lambda _: _.name))
