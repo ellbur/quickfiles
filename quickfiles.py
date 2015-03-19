@@ -141,8 +141,14 @@ def p(s):
         isstring = isinstance(s, basestring)
     except NameError:
         isstring = isinstance(s, str)
+        
     if isinstance(s, Path): return s
-    elif isstring: return Path('./'+os.path.normpath(os.path.relpath(s)))
+    elif isstring: 
+        if isinstance(s, unicode):
+            u = s
+        else:
+            u = unicode(s, 'utf-8')
+        return Path('./'+os.path.normpath(os.path.relpath(u)))
     else: raise TypeError
 _p = p
 
