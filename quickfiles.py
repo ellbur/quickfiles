@@ -28,90 +28,93 @@ class Path(unicode):
         result.rm()
         return result
     @property
-    def realpath(self): return os.path.realpath(str(self))
+    def realpath(self): return os.path.realpath(self)
     def __truediv__(self, next):
         return self.__div__(next)
     def __div__(self, next):
-        return p(str(self) + '/' + str(next))
+        return p(self + '/' + unicode(next))
     @property
-    def exists(self): return os.path.exists(str(self))
-    def against(self, where): return './' + os.path.relpath(str(self), str(where))
+    def exists(self): return os.path.exists(self)
+    def against(self, where): return './' + os.path.relpath(self, p(where))
+    def relpath(self, against): return os.path.relpath(self, p(against))
     def replant(self, src, dst): return p(dst) / self.against(src)
     def indir(self, dst): return self.replant(self.dir, dst)
     @property
-    def isdir(self): return os.path.isdir(str(self))
+    def isdir(self): return os.path.isdir(self)
     def chext(self, old, new):
-        assert str(self).endswith(old)
-        return p(str(self)[:-len(old)] + new)
+        assert self.endswith(old)
+        return p(self[:-len(old)] + new)
     def setext(self, new):
-        prefix = re.sub(r'\.[^\.\/]*$', '', str(self))
+        prefix = re.sub(r'\.[^\.\/]*$', '', self)
         return p(prefix + new)
+    def transform_name(self, f): return self.dir/f(self.name)
     @property
-    def name(self): return os.path.split(os.path.realpath(str(self)))[1]
+    def name(self): return os.path.split(os.path.realpath(self))[1]
     @property
     def dir(self):
-        if os.path.isdir(str(self)): return self
-        else: return p(os.path.split(os.path.realpath(str(self)))[0])
+        if os.path.isdir(self): return self
+        else: return p(os.path.split(os.path.realpath(self))[0])
     def make_parents(self): self.dir.makedir()
     def mkdir(self): return self.makedir()
+    def mkdirs(self): return self.makedir()
     def makedir(self):
         try:
-            os.makedirs(str(self))
+            os.makedirs(self)
         except OSError as e:
             if e.errno != 17: raise e
     @property
     def name(self):
-        return os.path.split(os.path.realpath(str(self)))[1]
+        return os.path.split(os.path.realpath(self))[1]
     @property
     def realpath(self):
-        return os.path.realpath(str(self))
+        return os.path.realpath(self)
     def __floordiv__(self, pat):
         if pat == '**':
             dirs = []
             def see(_, dir, __):
                 dirs.append(p(dir))
-            os.path.walk(str(self), see, None)
+            os.path.walk(self, see, None)
             return PTuple(sorted(dirs))
         else:
-            files = PTuple(p(_) for _ in glob(str(self) + '/' + pat))
+            files = PTuple(p(_) for _ in glob(self + '/' + pat))
             return PTuple(sorted(files, key=lambda _: _.name))
     def __mod__(self, how):
         if isinstance(how, RAND):
             import tempfile
             self.makedir()
-            _, path = tempfile.mkstemp(dir=str(self), prefix=how.prefix, suffix=how.suffix)
+            _, path = tempfile.mkstemp(dir=self, prefix=how.prefix, suffix=how.suffix)
             return p(path)
         elif isinstance(how, COUNTER):
-            candidates = (_ for _ in os.listdir(str(self)) if _.startswith(how.prefix))
+            candidates = (_ for _ in os.listdir(self) if _.startswith(how.prefix))
             number_strs = (c[len(how.prefix):] for c in candidates)
             numbers = [ ]
             for s in number_strs:
                 try: numbers.append(int(s))
                 except ValueError: pass
             now = max(numbers) + 1 if len(numbers)>0 else 1
-            return self/(how.prefix + str(now))
+            return self/(how.prefix + unicode(now))
         else:
             raise TypeError(how, 'should be one of', [RAND, COUNTER])
     
     def rm(self):
         if self.isdir:
-            shutil.rmtree(str(self))
+            shutil.rmtree(self)
         else:
-            os.unlink(str(self))
+            os.unlink(self)
     def set(self, wth):
         self.make_parents()
-        with open(str(self), 'w') as h:
+        with open(self, 'w') as h:
             h.write(wth)
     def clear(self):
         self.set('')
     def setas(self, wth):
         self.make_parents()
-        wth(open(str(self), 'w'))
+        wth(open(self, 'w'))
     def append(self, wth):
         self.make_parents()
-        open(str(self), 'a').write(wth)
+        open(self, 'a').write(wth)
     def open(self):
-        return open(str(self), 'r')
+        return open(self, 'r')
     def read(self):
         return self.open().read()
     @property
@@ -122,12 +125,12 @@ class Path(unicode):
         if dest.isdir:
             dest = dest / self.name
         if self.isdir:
-            shutil.copytree(str(self), str(dest))
+            shutil.copytree(self, unicode(dest))
         else:
-            shutil.copy2(str(self), str(dest))
+            shutil.copy2(self, unicode(dest))
     def delete_at_exit(self):
         import atexit
-        atexit.register(lambda: os.unlink(str(self)))
+        atexit.register(lambda: os.unlink(self))
     
 class COUNTER(nt('COUNTER', ['prefix'])): pass
 _RAND = nt('RAND', ['prefix', 'suffix'])
