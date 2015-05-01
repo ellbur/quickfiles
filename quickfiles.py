@@ -23,7 +23,8 @@ class Path(unicode):
     @staticmethod
     def mktemp():
         import tempfile
-        _, path = tempfile.mkstemp()
+        _, path = tempfile.mkstemp(prefix='tmpquickfiles')
+        os.close(_)
         result = p(path)
         result.rm()
         return result
