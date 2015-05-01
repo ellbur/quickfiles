@@ -33,7 +33,18 @@ class Path(unicode):
     def __truediv__(self, next):
         return self.__div__(next)
     def __div__(self, next):
-        return p(self + '/' + unicode(next))
+        return p(self.realpath + os.path.sep + unicode(next))
+    def __str__(self): 
+        slash = os.path.sep if self.endswith(os.path.sep) or self.endswith('/') else ''
+        try:
+            return './' + os.path.relpath(self.realpath) + slash
+        # This is needed on Windows because not all paths can be relativized.
+        except ValueError:
+            return self.realpath + slash
+    def __repr__(self): return self.__str__()
+    def __add__(self, x): 
+        slash = os.path.sep if self.endswith(os.path.sep) or self.endswith('/') else ''
+        return p(self.realpath + slash + x)
     @property
     def exists(self): return os.path.exists(self)
     def against(self, where): return './' + os.path.relpath(self, p(where))
@@ -163,7 +174,8 @@ def p(s):
             u = s
         else:
             u = unicode(s, 'utf-8')
-        return Path('./'+os.path.normpath(os.path.relpath(u)))
+        slash = os.path.sep if u.endswith(os.path.sep) or u.endswith('/') else ''
+        return Path(os.path.normpath(os.path.realpath(u)) + slash)
     else: raise TypeError
 _p = p
 
