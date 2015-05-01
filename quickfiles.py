@@ -124,6 +124,11 @@ class Path(unicode):
             shutil.rmtree(self)
         else:
             os.unlink(self)
+    def rmf(self):
+        try:
+            self.rm()
+        except:
+            pass
     def set(self, wth):
         self.make_parents()
         with open(self, 'w') as h:
