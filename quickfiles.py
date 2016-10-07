@@ -36,11 +36,7 @@ class Path(unicode):
         return p(self.realpath + os.path.sep + unicode(next))
     def __str__(self): 
         slash = os.path.sep if self.endswith(os.path.sep) or self.endswith('/') else ''
-        try:
-            return './' + os.path.relpath(self.realpath) + slash
-        # This is needed on Windows because not all paths can be relativized.
-        except ValueError:
-            return self.realpath + slash
+        return self.realpath + slash
     def __repr__(self): return self.__str__()
     def __add__(self, x): 
         slash = os.path.sep if self.endswith(os.path.sep) or self.endswith('/') else ''
