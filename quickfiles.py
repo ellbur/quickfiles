@@ -19,7 +19,12 @@ class PTuple(tuple):
             res.extend(func(_))
         return PTuple(res)
     
-class Path(unicode):
+if sys.version_info >= (3, 0):
+    unicode_base = str
+else:
+    unicode_base = unicode
+
+class Path(unicode_base):
     @staticmethod
     def mktemp():
         import tempfile
@@ -33,7 +38,7 @@ class Path(unicode):
     def __truediv__(self, next):
         return self.__div__(next)
     def __div__(self, next):
-        return p(self.realpath + os.path.sep + unicode(next))
+        return p(self.realpath + os.path.sep + unicode_base(next))
     def __str__(self): 
         slash = os.path.sep if self.endswith(os.path.sep) or self.endswith('/') else ''
         return self.realpath + slash
@@ -111,7 +116,7 @@ class Path(unicode):
                 try: numbers.append(int(s))
                 except ValueError: pass
             now = max(numbers) + 1 if len(numbers)>0 else 1
-            return self/(how.prefix + unicode(now))
+            return self/(how.prefix + unicode_base(now))
         else:
             raise TypeError(how, 'should be one of', [RAND, COUNTER])
     
@@ -149,12 +154,17 @@ class Path(unicode):
         if dest.isdir:
             dest = dest / self.name
         if self.isdir:
-            shutil.copytree(self, unicode(dest))
+            shutil.copytree(self, unicode_base(dest))
         else:
-            shutil.copy2(self, unicode(dest))
+            shutil.copy2(self, unicode_base(dest))
     def delete_at_exit(self):
         import atexit
-        atexit.register(lambda: os.unlink(self))
+        def f():
+            try:
+                os.unlink(self)
+            except:
+                pass
+        atexit.register(f)
     
 class COUNTER(nt('COUNTER', ['prefix'])): pass
 _RAND = nt('RAND', ['prefix', 'suffix'])
@@ -171,10 +181,10 @@ def p(s):
         
     if isinstance(s, Path): return s
     elif isstring: 
-        if isinstance(s, unicode):
+        if isinstance(s, unicode_base):
             u = s
         else:
-            u = unicode(s, 'utf-8')
+            u = unicode_base(s, 'utf-8')
         slash = os.path.sep if u.endswith(os.path.sep) or u.endswith('/') else ''
         return Path(os.path.normpath(os.path.realpath(u)) + slash)
     else: raise TypeError

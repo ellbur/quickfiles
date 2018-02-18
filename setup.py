@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name       = 'quickfiles',
-    version    = '0.124',
+    version    = '0.125',
     py_modules = ['quickfiles']
 )
 
