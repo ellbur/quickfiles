@@ -21,8 +21,10 @@ class PTuple(tuple):
     
 if sys.version_info >= (3, 0):
     unicode_base = str
+    walk = os.walk
 else:
     unicode_base = unicode
+    walk = os.path.walk
 
 class Path(unicode_base):
     @staticmethod
@@ -86,7 +88,7 @@ class Path(unicode_base):
             dirs = []
             def see(_, dir, __):
                 dirs.append(p(dir))
-            os.path.walk(self, see, None)
+            walk(self, see, None)
             return PTuple(sorted(dirs))
         elif pat == '***':
             dir_stack = [self]
