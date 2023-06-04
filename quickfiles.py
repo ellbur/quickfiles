@@ -35,8 +35,6 @@ class Path(unicode_base):
         result = p(path)
         result.rm()
         return result
-    @property
-    def realpath(self): return os.path.realpath(self)
     def __truediv__(self, next):
         return self.__div__(next)
     def __div__(self, next):
@@ -64,8 +62,6 @@ class Path(unicode_base):
         return p(prefix + new)
     def transform_name(self, f): return self.dir/f(self.name)
     @property
-    def name(self): return os.path.split(os.path.realpath(self))[1]
-    @property
     def dir(self):
         if os.path.isdir(self): return self
         else: return p(os.path.split(os.path.realpath(self))[0])
@@ -85,11 +81,7 @@ class Path(unicode_base):
         return os.path.realpath(self)
     def __floordiv__(self, pat):
         if pat == '**':
-            dirs = []
-            def see(_, dir, __):
-                dirs.append(p(dir))
-            walk(self, see, None)
-            return PTuple(sorted(dirs))
+            return PTuple(sorted([d for (d, _, _) in os.walk(self)]))
         elif pat == '***':
             dir_stack = [self]
             result = [ ]

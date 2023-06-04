@@ -36,6 +36,9 @@ c1.cp(c2)
 # Verify that it got there.
 print(c2.read())
 
+# Walk a directory
+print(tmp_dir // '**')
+
 # Clean up.
 tmp_dir.rm()
 
